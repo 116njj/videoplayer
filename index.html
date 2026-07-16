@@ -8,6 +8,17 @@
 </head>
 <body>
 
+  <!-- 💡 최상단 KOWAI 감성 커스텀 헤더 로고 바 추가 -->
+  <div class="header-logo-bar">
+    <div class="logo-icon">
+      <!-- SVG로 구현한 유령 심볼 아이콘 -->
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="#ffffff">
+        <path d="M12 2A9 9 0 0 0 3 11v9a1 1 0 0 0 1.62.78L7 18.43l2.38 2.35a1 1 0 0 0 1.41 0L12 19.57l1.21 1.21a1 1 0 0 0 1.41 0L17 18.43l2.38 2.35A1 1 0 0 0 21 20v-9a9 9 0 0 0-9-9zm-3 10a1.5 1.5 0 1 1 1.5-1.5A1.5 1.5 0 0 1 9 12zm6 0a1.5 1.5 0 1 1 1.5-1.5A1.5 1.5 0 0 1 15 12z"/>
+      </svg>
+    </div>
+    <span class="logo-text">KOWAI<span class="logo-dot">.</span></span>
+  </div>
+
   <div class="upload-section">
     <div class="form-group">
       <input type="text" id="input-filename" placeholder="videos 폴더에 올린 실제 파일명 입력 (예: test.mp4)">
@@ -19,7 +30,6 @@
 
   <div class="main-container">
     <div class="video-container" id="video-container">
-      <!-- 💡 순정 컨트롤러가 뜨지 않도록 완전 제어 형태로 고정 -->
       <video class="video" playsinline></video>
       
       <div id="speed-badge">2.0x >></div>
