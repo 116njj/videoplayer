@@ -10,10 +10,9 @@ body {
   align-items: center;
 }
 
-/* 클릭 차단 현상을 방지하기 위한 정밀 격자 배치 구조 */
 .upload-section { 
   position: relative;
-  z-index: 10; /* 비디오 마스크가 덮지 못하도록 레이어 순위를 최상위로 올림 */
+  z-index: 10;
   margin-bottom: 25px; 
   width: 100%; 
   max-width: 1000px; 
@@ -27,21 +26,23 @@ body {
   width: 100%;
 }
 
+/* 💡 제목 입력 상자 스타일: 다크 네온 감성 완벽 적용 */
 .upload-section input {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(157, 78, 221, 0.2);
+  background: rgba(157, 78, 221, 0.05);
+  border: 1px solid rgba(157, 78, 221, 0.3);
   border-radius: 4px;
   padding: 10px 14px;
   color: #fff;
   font-size: 13px;
   outline: none;
-  transition: border-color 0.2s;
+  flex-grow: 2; /* 주소창이 사라진 자리를 넉넉하게 채움 */
+  transition: all 0.2s;
 }
-#input-url { flex-grow: 2; background: rgba(255, 255, 255, 0.02); color: #888; }
-#input-title { flex-grow: 1; }
-.upload-section input:focus { border-color: #ff2e7e; }
+.upload-section input:focus { 
+  border-color: #ff2e7e; 
+  box-shadow: 0 0 10px rgba(255, 46, 126, 0.2);
+}
 
-/* 공통 버튼 디자인 규칙 */
 .select-file-btn, .upload-btn, .share-btn {
   display: inline-flex;
   align-items: center;
@@ -56,13 +57,22 @@ body {
   box-sizing: border-box;
 }
 
-.select-file-btn { background: rgba(157, 78, 221, 0.1); color: #9d4edd; border: 1px solid rgba(157, 78, 221, 0.3); }
-.select-file-btn:hover { background: rgba(157, 78, 221, 0.2); box-shadow: 0 0 12px rgba(157, 78, 221, 0.3); }
+/* 💡 파일 선택 버튼: 영상 등록 버튼처럼 배경+퍼플 네온 윤곽선 확실하게 추가 */
+.select-file-btn { 
+  background: rgba(157, 78, 221, 0.1); 
+  color: #b565f8; 
+  border: 1px solid rgba(157, 78, 221, 0.4); 
+  box-shadow: 0 0 12px rgba(157, 78, 221, 0.1);
+}
+.select-file-btn:hover { 
+  background: rgba(157, 78, 221, 0.2); 
+  box-shadow: 0 0 20px rgba(157, 78, 221, 0.4); 
+  text-shadow: 0 0 8px rgba(157, 78, 221, 0.6);
+}
 
 .upload-btn { background: rgba(255, 46, 126, 0.1); color: #ff2e7e; border: 1px solid rgba(255, 46, 126, 0.3); }
 .upload-btn:hover { background: rgba(255, 46, 126, 0.2); box-shadow: 0 0 20px rgba(255, 46, 126, 0.4); text-shadow: 0 0 8px rgba(255, 46, 126, 0.6); }
 
-/* 공유 버튼 (우측 가득 차는 네온 그레이프 컬러 테마) */
 .share-btn {
   background: #9d4edd;
   color: #ffffff;
@@ -73,16 +83,8 @@ body {
 }
 .share-btn:hover { background: #b565f8; box-shadow: 0 4px 20px rgba(157, 78, 221, 0.6); }
 
-/* 메인 프레임워크 구도 및 레이아웃 간섭 제거 */
-.main-container { 
-  position: relative;
-  z-index: 1;
-  display: flex; 
-  gap: 20px; 
-  width: 100%; 
-  max-width: 1000px; 
-  height: 480px; 
-}
+/* 메인 프레임워크 및 구성요소 디자인 (동일) */
+.main-container { position: relative; z-index: 1; display: flex; gap: 20px; width: 100%; max-width: 1000px; height: 480px; }
 .video-container { position: relative; width: 70%; background: #000000; border-radius: 6px; overflow: hidden; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); display: flex; align-items: center; }
 .video { width: 100%; display: block; }
 .controls { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(11, 11, 14, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid rgba(255, 46, 126, 0.2); opacity: 0; transition: opacity 0.2s ease; padding: 12px 16px; z-index: 5; }
@@ -94,7 +96,6 @@ body {
 .time-display { font-size: 12px; color: #a0aec0; font-family: monospace; }
 .volume-bar { width: 70px; accent-color: #9d4edd; height: 4px; cursor: pointer; }
 
-/* 리스트 컨테이너 */
 .playlist-container { width: 30%; background: rgba(18, 14, 26, 0.7); backdrop-filter: blur(10px); padding: 20px; border-radius: 6px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 1px solid rgba(157, 78, 221, 0.2); display: flex; flex-direction: column; }
 .playlist-container h3 { margin-top: 0; font-size: 15px; font-weight: 600; color: #9d4edd; letter-spacing: 1px; padding-bottom: 12px; border-bottom: 1px solid rgba(157, 78, 221, 0.2); }
 #playlist { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; }
