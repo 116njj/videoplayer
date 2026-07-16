@@ -26,7 +26,6 @@ body {
   width: 100%;
 }
 
-/* 💡 제목 입력 상자 스타일: 다크 네온 감성 완벽 적용 */
 .upload-section input {
   background: rgba(157, 78, 221, 0.05);
   border: 1px solid rgba(157, 78, 221, 0.3);
@@ -35,7 +34,7 @@ body {
   color: #fff;
   font-size: 13px;
   outline: none;
-  flex-grow: 2; /* 주소창이 사라진 자리를 넉넉하게 채움 */
+  flex-grow: 2;
   transition: all 0.2s;
 }
 .upload-section input:focus { 
@@ -57,7 +56,6 @@ body {
   box-sizing: border-box;
 }
 
-/* 💡 파일 선택 버튼: 영상 등록 버튼처럼 배경+퍼플 네온 윤곽선 확실하게 추가 */
 .select-file-btn { 
   background: rgba(157, 78, 221, 0.1); 
   color: #b565f8; 
@@ -83,7 +81,6 @@ body {
 }
 .share-btn:hover { background: #b565f8; box-shadow: 0 4px 20px rgba(157, 78, 221, 0.6); }
 
-/* 메인 프레임워크 및 구성요소 디자인 (동일) */
 .main-container { position: relative; z-index: 1; display: flex; gap: 20px; width: 100%; max-width: 1000px; height: 480px; }
 .video-container { position: relative; width: 70%; background: #000000; border-radius: 6px; overflow: hidden; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); display: flex; align-items: center; }
 .video { width: 100%; display: block; }
