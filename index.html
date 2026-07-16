@@ -8,9 +8,8 @@
 </head>
 <body>
 
-  <!-- 💡 Erato.dev 홈포트폴리오 헤더 로고 바 완벽 구현 (클릭 시 개인 홈페이지로 이동) -->
   <div class="header-logo-bar">
-    <a href="https://116njj.github.io/home/" class="logo-link">
+    <a href="https://github.io" class="logo-link">
       <div class="logo-icon-box">
         <svg xmlns="http://w3.org" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ghost-svg">
           <path d="M9 10h.01"></path>
@@ -23,7 +22,6 @@
     <span class="page-indicator">/ Video Player</span>
   </div>
 
-  <!-- 💡 메인 대시보드 카드 구도 스타일로 재배치한 조작 섹션 -->
   <div class="upload-section">
     <div class="form-group">
       <input type="text" id="input-filename" placeholder="📁 videos 폴더 내 실제 파일명 (예: test.mp4)">
@@ -34,9 +32,13 @@
   </div>
 
   <div class="main-container">
-    <!-- 16:9 규격 고정 비디오 박스 -->
     <div class="video-container" id="video-container">
       <video class="video" playsinline></video>
+      
+      <!-- 💡 유튜브 감성의 회전식 로딩 스피너 레이어 신규 추가 -->
+      <div id="loading-spinner" class="spinner-overlay">
+        <div class="spinner"></div>
+      </div>
       
       <div id="speed-badge">2.0x >></div>
 
@@ -51,7 +53,6 @@
       </div>
     </div>
 
-    <!-- 우측 재생 목록 단 영역 -->
     <div class="playlist-container">
       <div class="playlist-header">
         <svg xmlns="http://w3.org" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
