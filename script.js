@@ -6,115 +6,78 @@ const timeDisplay = document.querySelector('.time-display');
 const fullscreenBtn = document.querySelector('.fullscreen-btn');
 const playlist = document.getElementById('playlist');
 
-const fileUploader = document.getElementById('file-uploader');
+const inputFilename = document.getElementById('input-filename');
 const inputTitle = document.getElementById('input-title');
 const generatorBtn = document.getElementById('generator-btn');
 const shareBtn = document.getElementById('share-btn');
 const speedBadge = document.getElementById('speed-badge');
 
-let encodedVideoData = ""; 
 let isSpacePressed = false;
 
-// 1. [복원 엔진] 페이지가 열릴 때 URL 주소창에 내장된 '진짜 비디오 데이터 코드'를 완전 디코딩하여 즉시 스트리밍 재생 세팅
+// 💡 현재 내 깃허브 Pages 고유 계정 도메인을 감지하여 내부 videos/ 폴더의 절대 웹 주소를 실시간 자동 조립
+const GITHUB_VIDEOS_BASE = window.location.origin + window.location.pathname.replace('index.html', '') + 'videos/';
+
+// 1. [복원 엔진] 페이지 오픈 시 주소창 압축코드(?list=...) 해독 후 실시간 스트리밍 매핑
 document.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.search);
   const compressedData = urlParams.get('list');
 
   if (!compressedData) {
-    playlist.innerHTML = '<li style="cursor:default; border:none; color:#555;">재생 목록이 비어 있습니다.<br>상단에서 동영상 파일을 선택하세요!</li>';
+    playlist.innerHTML = '<li style="cursor:default; border:none; color:#555;">재생 목록이 비어 있습니다.<br>상단에 파일명과 제목을 입력해 등록하세요!</li>';
     return;
   }
 
   try {
-    // URL에 압축되어 있던 동영상 소스 및 타이틀 배열을 완벽 복원
+    // 코딩애플 상남자 연산법 기반 디코딩 복원
     const decodedJson = decodeURIComponent(atob(compressedData));
     const videoList = JSON.parse(decodedJson);
 
     videoList.forEach((vid, index) => {
       const li = document.createElement('li');
-      li.dataset.src = vid.url; // 💡 여기에 복원된 진짜 동영상 데이터 텍스트 코드가 그대로 보관됨!
+      li.dataset.src = GITHUB_VIDEOS_BASE + vid.file; // 깃허브 클라우드 동영상 스트리밍 원천 URL 복원 성공!
+      li.dataset.filename = vid.file; 
       li.textContent = vid.title;
       
       if (index === 0) {
         li.classList.add('active');
-        video.src = vid.url; // DB 접근 없이 복원된 원천 주소를 플레이어 소스에 다이렉트 주입하여 재생 대기
+        video.src = li.dataset.src; // 조립된 절대 주소를 꽂아 타인 공유 시 100% 무조건 즉시 재생
         video.load();
       }
       playlist.appendChild(li);
     });
   } catch (e) {
-    playlist.innerHTML = '<li style="color:#ff5b5b;">잘못되었거나 손상된 압축 URL 데이터 주소입니다.</li>';
+    playlist.innerHTML = '<li style="color:#ff5b5b;">손상되었거나 잘못된 공유 URL 주소입니다.</li>';
   }
 });
 
-// 2. [컴파일러 엔진] 내 컴퓨터에서 mp4 파일을 고르면 즉시 주소창 호환용 텍스트 스트림 코드로 쪼개기 변환
-fileUploader.addEventListener('change', (e) => {
-  const file = e.target.files;
-  if (!file) return;
-
-  inputTitle.value = file.name.replace('.mp4', ''); 
-  
-  // 데이터 변환 안정성 확보를 위해 대기 가이드 작동
-  generatorBtn.disabled = true;
-  generatorBtn.textContent = "⏳ 비디오 파일 시스템 압축 및 호스팅 변환 중...";
-  generatorBtn.style.opacity = "0.6";
-
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    encodedVideoData = event.target.result; // 비디오 파일 바이너리 완전 코드화 성공
-    
-    // 변환 완료 후 안전 락 해제
-    generatorBtn.disabled = false;
-    generatorBtn.textContent = "🔗 영상 내부 호스팅 및 URL 압축";
-    generatorBtn.style.opacity = "1";
-
-    // 선택하자마자 플레이어에서 먼저 즉시 시청 가능하게 처리
-    video.src = encodedVideoData;
-    video.load();
-    video.play();
-    playBtn.textContent = '❚❚';
-  };
-  reader.onerror = () => {
-    alert("동영상 파일 파일 포맷 컴파일에 실패했습니다.");
-    generatorBtn.disabled = false;
-  };
-  reader.readAsDataURL(file); 
-});
-
-// 3. [통합 엔진] 기존 리스트 데이터(동영상 데이터 포함)와 이번 신규 영상을 합쳐 단 한 줄의 압축 링크 생성
+// 2. [등록 엔진] 기존 목록의 가벼운 파일명들과 신규 정보를 누적 병합해 단 한 줄로 재압축
 generatorBtn.addEventListener('click', () => {
-  const newTitle = inputTitle.value.trim();
+  const filenameValue = inputFilename.value.trim();
+  const titleValue = inputTitle.value.trim() || "새로운 비디오";
 
-  if (!encodedVideoData) {
-    alert("동영상 파일 변환이 아직 완료되지 않았습니다. 잠시만 대기 후 눌러주세요!");
-    return;
-  }
-  if (!newTitle) {
-    alert("동영상 제목을 작성해 주세요!");
+  if (!filenameValue) {
+    alert("videos 폴더에 올린 실제 파일명(예: test.mp4)을 입력해 주세요!");
     return;
   }
 
   const currentList = [];
   
-  // 💡 핵심: 기존 목록에 박혀 있던 모든 비디오들의 '진짜 비디오 데이터'를 누락 없이 싹 긁어모음!
   playlist.querySelectorAll('li').forEach(item => {
-    if (item.dataset.src) {
-      currentList.push({ url: item.dataset.src, title: item.textContent.trim() });
+    if (item.dataset.filename) {
+      currentList.push({ file: item.dataset.filename, title: item.textContent.trim() });
     }
   });
 
-  // 이번에 새로 호스팅 가공 완료한 비디오 텍스트 데이터 병합 누적
-  currentList.push({ url: encodedVideoData, title: newTitle });
+  currentList.push({ file: filenameValue, title: titleValue });
 
-  // 상남자식 코딩애플 JSON 대용량 원시 변환 레이어 연산 실행
+  // 용량 제한 걱정이 없는 경량 텍스트 단축 가공 코어 엔진
   const jsonString = encodeURIComponent(JSON.stringify(currentList));
   const compressedBase64 = btoa(jsonString);
 
-  // 데이터가 완전 누적 빌드된 주소창으로 리다이렉션 점프 새로고침!
   window.location.search = `list=${compressedBase64}`;
 });
 
-// 4. [리스트 재생 엔진] 리스트 제목을 마우스로 클릭하면 저장된 비디오 데이터 소스를 실시간 다이렉트 덤프 재생!
+// 3. 리스트 아이템 클릭 시 즉시 비디오 엔진 가동
 playlist.addEventListener('click', (e) => {
   const li = e.target.closest('li');
   if (!li || !li.dataset.src) return;
@@ -122,22 +85,21 @@ playlist.addEventListener('click', (e) => {
   document.querySelectorAll('#playlist li').forEach(item => item.classList.remove('active'));
   li.classList.add('active');
 
-  // 외부 연동이나 데이터베이스 매칭 없이 엘리먼트 내부에 각인된 원시 코드로 100% 즉시 강제 재생!
   video.src = li.dataset.src;
   video.load(); 
   video.play(); 
   playBtn.textContent = '❚❚';
 });
 
-// 5. 단축 공유 주소 원클릭 캡처 복사
+// 4. 복사 전송용 통합 단축 주소 복사
 shareBtn.addEventListener('click', () => {
   if (!window.location.search.includes('list=')) {
-    alert("공유할 플레이리스트 목록이 비어 있습니다. 영상을 먼저 등록해 주세요!");
+    alert("공유할 플레이리스트 목록이 비어 있습니다!");
     return;
   }
   navigator.clipboard.writeText(window.location.href)
-    .then(() => alert("현재 재생목록의 모든 파일 정보가 암호화 결합된 단축 공유 주소가 복사되었습니다!"))
-    .catch(() => alert("주소창 URL 링크를 마우스로 직접 긁어 복사해 주세요."));
+    .then(() => alert("URL 링크 압축 및 복사 성공! 이 주소를 다른 사람에게 복붙해서 보내면 전 세계 어디서든 영상이 100% 즉시 시원하게 재생됩니다."))
+    .catch(() => alert("주소창 URL 링크를 마우스로 직접 복사해 주세요."));
 });
 
 function toggleFullscreen() {
@@ -150,9 +112,9 @@ function toggleFullscreen() {
 }
 fullscreenBtn.addEventListener('click', toggleFullscreen);
 
-/* --- ⌨️ 유튜브 스타일 명품 단축키 시스템 --- */
+/* --- ⌨️ 유튜브 스타일 명품 단축키 시스템 (Space 2배속, ◀, ▶, F) --- */
 window.addEventListener('keydown', (e) => {
-  if (document.activeElement === inputTitle) return;
+  if (document.activeElement === inputTitle || document.activeElement === inputFilename) return;
 
   switch (e.key) {
     case " ":
@@ -174,7 +136,7 @@ window.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('keyup', (e) => {
-  if (document.activeElement === inputTitle) return;
+  if (document.activeElement === inputTitle || document.activeElement === inputFilename) return;
   if (e.key === " ") {
     e.preventDefault(); isSpacePressed = false; video.playbackRate = 1.0; speedBadge.style.opacity = "0";
   }
