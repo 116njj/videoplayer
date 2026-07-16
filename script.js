@@ -3,71 +3,63 @@ const playBtn = document.querySelector('.play-btn');
 const progressBar = document.querySelector('.progress-bar');
 const volumeBar = document.querySelector('.volume-bar');
 const timeDisplay = document.querySelector('.time-display');
-const fileInput = document.getElementById('file-input');
 const playlist = document.getElementById('playlist');
+
+// 등록 인터페이스 노드 추출
+const inputUrl = document.getElementById('input-url');
+const inputTitle = document.getElementById('input-title');
+const generatorBtn = document.getElementById('generator-btn');
 
 let isInitialLoaded = false;
 
-// 1. 페이지 로드 시: 관리자 JSON과 방문자 LocalStorage 동시 로드
+// 1. [기존 기능] 페이지가 열릴 때 현재 URL에 박혀있는 영상 정보 추출하여 파싱
 document.addEventListener("DOMContentLoaded", () => {
-  // 관리자 영상 불러오기 (video-list.json)
-  fetch('video-list.json')
-    .then(res => res.json())
-    .then(adminVideos => {
-      adminVideos.forEach(vid => {
-        addVideoUI(vid.title, vid.file, true);
-      });
-      loadVisitorVideos(); // 관리자 영상 뒤에 방문자 영상 로드
-    })
-    .catch(() => {
-      console.log("고정 영상이 없거나 json 파일 로드 실패");
-      loadVisitorVideos();
-    });
+  const urlParams = new URLSearchParams(window.location.search);
+  const urls = urlParams.getAll('url');
+  const titles = urlParams.getAll('title');
+
+  if (urls.length === 0) {
+    playlist.innerHTML = '<li style="cursor:default; border:none; color:#555;">재생 목록이 비어 있습니다.<br>상단에 mp4 주소를 등록해 보세요!</li>';
+    return;
+  }
+
+  urls.forEach((url, index) => {
+    const title = titles[index] || `영상 ${index + 1}`;
+    const li = document.createElement('li');
+    li.dataset.src = decodeURIComponent(url);
+    li.textContent = decodeURIComponent(title);
+    
+    if (index === 0) {
+      li.classList.add('active');
+      video.src = li.dataset.src;
+      video.load();
+    }
+    playlist.appendChild(li);
+  });
 });
 
-// 방문자 로컬 비디오 로드 함수
-function loadVisitorVideos() {
-  const savedList = JSON.parse(localStorage.getItem("userVideos")) || [];
-  savedList.forEach(vid => {
-    addVideoUI(vid.name, vid.src, false);
-  });
-}
+// 2. 💡 [핵심 신규 기능] 입력창에 정보를 쓰고 버튼을 누르면 완성된 파라미터 URL 주소로 강제 이동
+generatorBtn.addEventListener('click', () => {
+  const urlValue = inputUrl.value.trim();
+  const titleValue = inputTitle.value.trim() || "새로운 비디오";
 
-// 2. 리스트 UI에 영상 추가하는 공통 함수
-function addVideoUI(name, src, isFixed = false) {
-  const li = document.createElement('li');
-  li.dataset.src = src;
-  
-  const titleSpan = document.createElement('span');
-  titleSpan.textContent = name;
-  li.appendChild(titleSpan);
-
-  if (isFixed) {
-    li.classList.add('fixed-video');
-  } else {
-    // 방문자 영상일 경우에만 우측에 삭제 버튼 추가
-    const delBtn = document.createElement('button');
-    delBtn.textContent = '삭제';
-    delBtn.classList.add('del-btn');
-    delBtn.addEventListener('click', (e) => {
-      e.stopPropagation(); // 리스트 클릭 이벤트 방지
-      li.remove();
-      removeFormStorage(name);
-    });
-    li.appendChild(delBtn);
+  if (!urlValue) {
+    alert("동영상 파일 주소(.mp4)를 입력해 주세요!");
+    return;
   }
 
-  playlist.appendChild(li);
+  // 현재 브라우저 URL 정보 분석
+  const currentParams = new URLSearchParams(window.location.search);
 
-  // 처음으로 로드된 영상이 있다면 플레이어 기본 영상으로 세팅 (자동 재생X)
-  if (!isInitialLoaded) {
-    video.src = src;
-    video.load();
-    isInitialLoaded = true;
-  }
-}
+  // 기존 플레이리스트에 누적으로 추가하고 싶다면 뒤에 새 파라미터 덧붙이기
+  currentParams.append('url', encodeURIComponent(urlValue));
+  currentParams.append('title', encodeURIComponent(titleValue));
 
-/* --- 플레이어 기본 기능 컨트롤 동작 --- */
+  // 조립된 최종 쿼리문을 들고 해당 URL 주소로 강제 페이지 리프레시 이동!
+  window.location.search = currentParams.toString();
+});
+
+/* --- 비디오 플레이어 제어 로직 --- */
 function togglePlay() {
   video.paused ? video.play() : video.pause();
   playBtn.textContent = video.paused ? '▶' : '❚❚';
@@ -75,10 +67,8 @@ function togglePlay() {
 
 function updateProgress() {
   if (!video.duration) return;
-  const percent = (video.currentTime / video.duration) * 100;
-  progressBar.value = percent;
+  progressBar.value = (video.currentTime / video.duration) * 100;
   
-  // 시간 표시 포맷 (00:00)
   const curMin = String(Math.floor(video.currentTime / 60)).padStart(2, '0');
   const curSec = String(Math.floor(video.currentTime % 60)).padStart(2, '0');
   const durMin = String(Math.floor(video.duration / 60)).padStart(2, '0');
@@ -86,50 +76,28 @@ function updateProgress() {
   timeDisplay.textContent = `${curMin}:${curSec} / ${durMin}:${durSec}`;
 }
 
-// 플레이어 컨트롤러 이벤트 바인딩
 playBtn.addEventListener('click', togglePlay);
 video.addEventListener('click', togglePlay);
 video.addEventListener('timeupdate', updateProgress);
-progressBar.addEventListener('input', () => {
-  video.currentTime = (progressBar.value * video.duration) / 100;
-});
+progressBar.addEventListener('input', () => { video.currentTime = (progressBar.value * video.duration) / 100; });
 volumeBar.addEventListener('input', () => { video.volume = volumeBar.value; });
 
-// 리스트 아이템 클릭 시 해당 영상 재생
 playlist.addEventListener('click', (e) => {
   const li = e.target.closest('li');
-  if (!li) return;
+  if (!li || !li.dataset.src) return;
+  
+  document.querySelectorAll('#playlist li').forEach(item => item.classList.remove('active'));
+  li.classList.add('active');
+  
   video.src = li.dataset.src;
   video.load();
   video.play();
   playBtn.textContent = '❚❚';
 });
 
-// 3. 방문자 파일 업로드 처리 및 로컬 저장소 저장
-fileInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const videoURL = URL.createObjectURL(file);
-  
-  // UI 추가
-  addVideoUI(file.name, videoURL, false);
-
-  // LocalStorage에 메타데이터 저장 (다음 접속 시 로드용)
-  const savedList = JSON.parse(localStorage.getItem("userVideos")) || [];
-  savedList.push({ name: file.name, src: videoURL });
-  localStorage.setItem("userVideos", JSON.stringify(savedList));
-  
-  // 올리자마자 바로 재생 가능하게 처리
-  video.src = videoURL;
-  video.load();
-  video.play();
-  playBtn.textContent = '❚❚';
+video.addEventListener('ended', () => {
+  const currentActive = playlist.querySelector('.active');
+  if (!currentActive) return;
+  const nextVideo = currentActive.nextElementSibling;
+  if (nextVideo && nextVideo.dataset.src) nextVideo.click();
 });
-
-// 로컬 저장소에서 제거 함수
-function removeFormStorage(name) {
-  let savedList = JSON.parse(localStorage.getItem("userVideos")) || [];
-  savedList = savedList.filter(vid => vid.name !== name);
-  localStorage.setItem("userVideos", JSON.stringify(savedList));
-}
