@@ -5,6 +5,7 @@ const volumeBar = document.querySelector('.volume-bar');
 const timeDisplay = document.querySelector('.time-display');
 const fullscreenBtn = document.querySelector('.fullscreen-btn');
 const playlist = document.getElementById('playlist');
+const videoContainer = document.getElementById('video-container'); // 💡 부모 컨테이너 수집
 
 const inputFilename = document.getElementById('input-filename');
 const inputTitle = document.getElementById('input-title');
@@ -14,10 +15,15 @@ const speedBadge = document.getElementById('speed-badge');
 
 let isSpacePressed = false;
 
-// 💡 현재 내 깃허브 Pages 고유 계정 도메인을 감지하여 내부 videos/ 폴더의 절대 웹 주소를 실시간 자동 조립
+// 내 깃허브 고유 호스팅 도메인 주소 자동 추출 공식
 const GITHUB_VIDEOS_BASE = window.location.origin + window.location.pathname.replace('index.html', '') + 'videos/';
 
-// 1. [복원 엔진] 페이지 오픈 시 주소창 압축코드(?list=...) 해독 후 실시간 스트리밍 매핑
+// 안전한 유니코드 다국어(한글) Base64 변환 압축 세트 (인코딩 에러 원천 차단)
+/* 전 세계 브라우저 표준 명세에 맞춘 암호화 가공 처리 */
+function utoa(str) { return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode('0x' + p1))); }
+function atou(str) { return decodeURIComponent(atob(str).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')); }
+
+// 1. [복원] 주소창 암호문을 에러 없이 완벽히 해독하여 리스트 연동
 document.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.search);
   const compressedData = urlParams.get('list');
@@ -28,40 +34,39 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   try {
-    // 코딩애플 상남자 연산법 기반 디코딩 복원
-    const decodedJson = decodeURIComponent(atob(compressedData));
+    // 안전 디코더 구동
+    const decodedJson = atou(compressedData);
     const videoList = JSON.parse(decodedJson);
 
     videoList.forEach((vid, index) => {
       const li = document.createElement('li');
-      li.dataset.src = GITHUB_VIDEOS_BASE + vid.file; // 깃허브 클라우드 동영상 스트리밍 원천 URL 복원 성공!
+      li.dataset.src = GITHUB_VIDEOS_BASE + vid.file; 
       li.dataset.filename = vid.file; 
       li.textContent = vid.title;
       
       if (index === 0) {
         li.classList.add('active');
-        video.src = li.dataset.src; // 조립된 절대 주소를 꽂아 타인 공유 시 100% 무조건 즉시 재생
+        video.src = li.dataset.src; 
         video.load();
       }
       playlist.appendChild(li);
     });
   } catch (e) {
-    playlist.innerHTML = '<li style="color:#ff5b5b;">손상되었거나 잘못된 공유 URL 주소입니다.</li>';
+    playlist.innerHTML = '<li style="color:#ff5b5b;">손상되었거나 잘못된 고유 단축 주소입니다.</li>';
   }
 });
 
-// 2. [등록 엔진] 기존 목록의 가벼운 파일명들과 신규 정보를 누적 병합해 단 한 줄로 재압축
+// 2. [등록] 리스트 데이터를 가공 및 한글 깨짐 없이 정밀 압축 전환
 generatorBtn.addEventListener('click', () => {
   const filenameValue = inputFilename.value.trim();
   const titleValue = inputTitle.value.trim() || "새로운 비디오";
 
   if (!filenameValue) {
-    alert("videos 폴더에 올린 실제 파일명(예: test.mp4)을 입력해 주세요!");
+    alert("videos 폴더에 올린 실제 파일명(예: test.mp4)을 기입하세요!");
     return;
   }
 
   const currentList = [];
-  
   playlist.querySelectorAll('li').forEach(item => {
     if (item.dataset.filename) {
       currentList.push({ file: item.dataset.filename, title: item.textContent.trim() });
@@ -70,14 +75,12 @@ generatorBtn.addEventListener('click', () => {
 
   currentList.push({ file: filenameValue, title: titleValue });
 
-  // 용량 제한 걱정이 없는 경량 텍스트 단축 가공 코어 엔진
-  const jsonString = encodeURIComponent(JSON.stringify(currentList));
-  const compressedBase64 = btoa(jsonString);
-
+  // 자체 보정 특수 안심 인코더 모듈 통과
+  const compressedBase64 = utoa(JSON.stringify(currentList));
   window.location.search = `list=${compressedBase64}`;
 });
 
-// 3. 리스트 아이템 클릭 시 즉시 비디오 엔진 가동
+// 3. 리스트 클릭 시 매칭 스트리밍
 playlist.addEventListener('click', (e) => {
   const li = e.target.closest('li');
   if (!li || !li.dataset.src) return;
@@ -86,33 +89,33 @@ playlist.addEventListener('click', (e) => {
   li.classList.add('active');
 
   video.src = li.dataset.src;
-  video.load(); 
-  video.play(); 
-  playBtn.textContent = '❚❚';
+  video.load(); video.play(); playBtn.textContent = '❚❚';
 });
 
-// 4. 복사 전송용 통합 단축 주소 복사
+// 4. 단축 주소 원클릭 클립보드 패치 복사
 shareBtn.addEventListener('click', () => {
   if (!window.location.search.includes('list=')) {
-    alert("공유할 플레이리스트 목록이 비어 있습니다!");
+    alert("공유할 목록이 비어 있습니다!");
     return;
   }
   navigator.clipboard.writeText(window.location.href)
-    .then(() => alert("URL 링크 압축 및 복사 성공! 이 주소를 다른 사람에게 복붙해서 보내면 전 세계 어디서든 영상이 100% 즉시 시원하게 재생됩니다."))
+    .then(() => alert("성공! 전 세계 어디서든 재생 오류가 없는 단축 공유 주소가 클립보드에 복사되었습니다!"))
     .catch(() => alert("주소창 URL 링크를 마우스로 직접 복사해 주세요."));
 });
 
+// 5. 💡 [전체화면 핵심 교정] HTML5 순정창을 무력화하고 우리가 만든 네온 UI 상자 전체를 전체화면 처리
 function toggleFullscreen() {
   if (!document.fullscreenElement) {
-    if (video.requestFullscreen) video.requestFullscreen();
-    else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+    // 비디오 단독이 아닌, 비디오 컨테이너 상자 전체를 스크린 확장
+    if (videoContainer.requestFullscreen) videoContainer.requestFullscreen();
+    else if (videoContainer.webkitRequestFullscreen) videoContainer.webkitRequestFullscreen();
   } else {
     if (document.exitFullscreen) document.exitFullscreen();
   }
 }
 fullscreenBtn.addEventListener('click', toggleFullscreen);
 
-/* --- ⌨️ 유튜브 스타일 명품 단축키 시스템 (Space 2배속, ◀, ▶, F) --- */
+/* --- ⌨️ 유튜브 스타일 고급 단축키 엔진 --- */
 window.addEventListener('keydown', (e) => {
   if (document.activeElement === inputTitle || document.activeElement === inputFilename) return;
 
