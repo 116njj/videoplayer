@@ -8,60 +8,15 @@
 </head>
 <body>
 
-  <!-- 상단 제어 영역 (불필요한 주소 상자 제거) -->
+  <!-- 상단 제어 영역 (주소창 흔적도 없이 삭제 완료) -->
   <div class="upload-section">
     <div class="form-group">
       <input type="file" id="file-uploader" accept="video/mp4" style="display:none;">
       <label for="file-uploader" class="select-file-btn">📁 동영상 파일 선택</label>
       <input type="text" id="input-title" placeholder="동영상 제목을 입력하세요">
-      <button id="generator-btn" class="upload-btn">🔗 영상 등록 및 URL 이동</button>
+      <button id="generator-btn" class="upload-btn">🔗 영상 등록 및 리스트 저장</button>
     </div>
-    <button id="share-btn" class="share-btn">📢 현재 플레이리스트 공유하기</button>
-  </div>
-
-  <div class="main-container">
-    <div class="video-container">
-      <video class="video"></video>
-      
-      <div class="controls">
-        <input type="range" class="progress-bar" min="0" max="100" value="0">
-        <div class="buttons">
-          <button class="play-btn">▶</button>
-          <span class="time-display">00:00 / 00:00</span>
-          <input type="range" class="volume-bar" min="0" max="1" step="0.1" value="1">
-          <button class="fullscreen-btn" style="margin-left: auto;">⛶</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="playlist-container">
-      <h3>재생 목록</h3>
-      <ul id="playlist"></ul>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>나만의 커스텀 동영상 플레이어</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-  <!-- 상단 제어 영역 (불필요한 주소 상자 제거) -->
-  <div class="upload-section">
-    <div class="form-group">
-      <input type="file" id="file-uploader" accept="video/mp4" style="display:none;">
-      <label for="file-uploader" class="select-file-btn">📁 동영상 파일 선택</label>
-      <input type="text" id="input-title" placeholder="동영상 제목을 입력하세요">
-      <button id="generator-btn" class="upload-btn">🔗 영상 등록 및 URL 이동</button>
-    </div>
-    <button id="share-btn" class="share-btn">📢 현재 플레이리스트 공유하기</button>
+    <button id="share-btn" class="share-btn">📢 현재 플레이리스트 공유하기 (목록 주소 복사)</button>
   </div>
 
   <div class="main-container">
