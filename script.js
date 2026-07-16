@@ -12,6 +12,7 @@ const generatorBtn = document.getElementById('generator-btn');
 const shareBtn = document.getElementById('share-btn');
 const speedBadge = document.getElementById('speed-badge');
 const videoContainer = document.getElementById('video-container');
+const loadingSpinner = document.getElementById('loading-spinner'); // 💡 스피너 노드 수집
 
 let isSpacePressed = false;
 
@@ -152,7 +153,7 @@ function toggleFullscreen() {
 }
 if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
 
-/* --- ⌨️ 유튜브 스타일 명품 단축키 시스템 (볼륨 제어 기능 보강) --- */
+/* --- ⌨️ 유튜브 스타일 명품 단축키 시스템 --- */
 window.addEventListener('keydown', (e) => {
   if (document.activeElement === inputTitle || document.activeElement === inputFilename) return;
 
@@ -174,17 +175,15 @@ window.addEventListener('keydown', (e) => {
         video.currentTime = Math.max(0, video.currentTime - 5);
       }
       break;
-    // 💡 [신규 기능] 위쪽 방향키: 볼륨 5% 올리기
     case "ArrowUp":
       e.preventDefault();
       video.volume = Math.min(1.0, video.volume + 0.05);
-      volumeBar.value = video.volume; // UI 슬라이더 위치 연동
+      volumeBar.value = video.volume;
       break;
-    // 💡 [신규 기능] 아래쪽 방향키: 볼륨 5% 내리기
     case "ArrowDown":
       e.preventDefault();
       video.volume = Math.max(0.0, video.volume - 0.05);
-      volumeBar.value = video.volume; // UI 슬라이더 위치 연동
+      volumeBar.value = video.volume;
       break;
     case "f":
     case "F":
@@ -224,6 +223,18 @@ progressBar.addEventListener('input', () => {
   if (!isNaN(video.duration) && isFinite(video.duration)) { video.currentTime = (progressBar.value * video.duration) / 100; }
 });
 volumeBar.addEventListener('input', () => { video.volume = volumeBar.value; });
+
+/* --- 💡 [신규 핵심 연동] 실시간 버퍼링 상태 스니핑 이벤트 리스너 패치 --- */
+// 영상을 처음 로딩하기 시작할 때 스피너 켜기
+video.addEventListener('loadstart', () => { loadingSpinner.classList.add('show'); });
+// 인터넷이 느려서 영상이 버퍼링(대기)에 걸렸을 때 스피너 켜기
+video.addEventListener('waiting', () => { loadingSpinner.classList.add('show'); });
+// 버퍼링이 끝나고 영상이 다시 시원하게 구동되기 시작할 때 스피너 끄기
+video.addEventListener('playing', () => { loadingSpinner.classList.remove('show'); });
+// 재생 가능한 충분한 데이터가 확보되었을 때 스피너 끄기
+video.addEventListener('canplay', () => { loadingSpinner.classList.remove('show'); });
+// 주소오류 등으로 미디어가 아예 정지했거나 뻑났을 때 안전하게 스피너 끄기
+video.addEventListener('error', () => { loadingSpinner.classList.remove('show'); });
 
 video.addEventListener('ended', () => {
   const currentActive = playlist.querySelector('.active');
