@@ -11,94 +11,146 @@ const inputTitle = document.getElementById('input-title');
 const generatorBtn = document.getElementById('generator-btn');
 const shareBtn = document.getElementById('share-btn');
 
-let isInitialLoaded = false;
-let tempVideoUrl = ""; // 💡 화면에 안 보이고 내부에만 가상 주소를 안전하게 저장할 숨김 변수
+let db = null;
+let currentSelectedFile = null;
 
-// 1. [복원] 페이지 오픈 시 단축 압축 데이터 해독 연산
-document.addEventListener("DOMContentLoaded", () => {
+// 1. 브라우저 데이터베이스(IndexedDB) 초기화 설정 구동
+const dbRequest = indexedDB.open("VideoPlayerDB", 1);
+dbRequest.onupgradeneeded = (e) => {
+  db = e.target.result;
+  if (!db.objectStoreNames.contains("videos")) {
+    db.createObjectStore("videos", { keyPath: "title" });
+  }
+};
+dbRequest.onsuccess = (e) => {
+  db = e.target.result;
+  initPlayer(); // DB가 활성화된 후 플레이어 연산 작동
+};
+
+// 2. 초기 리스트 복원 로직
+function initPlayer() {
   const urlParams = new URLSearchParams(window.location.search);
   const compressedData = urlParams.get('list');
 
   if (!compressedData) {
-    playlist.innerHTML = '<li style="cursor:default; border:none; color:#555;">재생 목록이 비어 있습니다.<br>상단에서 동영상 파일을 선택해 보세요!</li>';
+    playlist.innerHTML = '<li style="cursor:default; border:none; color:#555;">재생 목록이 비어 있습니다.<br>상단에서 동영상 파일을 추가하세요!</li>';
     return;
   }
 
   try {
     const decodedJson = decodeURIComponent(atob(compressedData));
-    const videoList = JSON.parse(decodedJson);
+    const titleList = JSON.parse(decodedJson); // URL에서는 제목 배열들만 해독함
 
-    videoList.forEach((vid, index) => {
+    const transaction = db.transaction(["videos"], "readonly");
+    const store = transaction.objectStore("videos");
+
+    titleList.forEach((title, index) => {
       const li = document.createElement('li');
-      li.dataset.src = vid.url;
-      li.textContent = vid.title;
-      
+      li.textContent = title;
+      playlist.appendChild(li);
+
+      // 첫 영상은 활성화 및 비디오 로드 연동
       if (index === 0) {
         li.classList.add('active');
-        video.src = li.dataset.src;
-        video.load();
+        const getReq = store.get(title);
+        getReq.onsuccess = () => {
+          if (getReq.result) {
+            video.src = URL.createObjectURL(getReq.result.blob);
+            video.load();
+          }
+        };
       }
-      playlist.appendChild(li);
     });
-    isInitialLoaded = true;
   } catch (e) {
-    playlist.innerHTML = '<li style="color:#ff5b5b;">잘못되었거나 손상된 단축 주소입니다.</li>';
+    playlist.innerHTML = '<li style="color:#ff5b5b;">재생목록 파싱 오류가 발생했습니다.</li>';
   }
-});
+}
 
-// 2. [자동설정] 주소 입력창 노출 없이 파일 변경 즉시 내부 전역 메모리에 동영상 소스 안착
+// 3. 파일 선택 시 제목 칸에 자동 이름 기입
 fileUploader.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
-
-  tempVideoUrl = URL.createObjectURL(file); // 내부 메모리에 안전하게 매핑
-  inputTitle.value = file.name.replace('.mp4', ''); // 인풋창엔 타이틀만 깔끔히 자동 완성
+  currentSelectedFile = file; // 원본 바이너리 보존
+  inputTitle.value = file.name.replace('.mp4', '');
 });
 
-// 3. [등록] 주소창 누락 에러 원천 차단 및 통합 데이터 압축 이주
+// 4. 저장 및 등록 버튼 클릭 이벤트
 generatorBtn.addEventListener('click', () => {
-  const newTitle = inputTitle.value.trim() || "새로운 비디오";
+  const newTitle = inputTitle.value.trim();
 
-  // 인풋박스 대신 내부 변수 검증을 거침으로써 주소 오류 완벽 차단
-  if (!tempVideoUrl) {
-    alert("먼저 '동영상 파일 선택' 버튼을 눌러 비디오를 등록해 주세요!");
+  if (!currentSelectedFile || !newTitle) {
+    alert("파일을 선택하고 동영상 제목을 입력해 주세요!");
     return;
   }
 
-  const currentList = [];
-  playlist.querySelectorAll('li').forEach(item => {
-    if (item.dataset.src) {
-      currentList.push({ url: item.dataset.src, title: item.textContent });
-    }
-  });
+  // 대용량 파일을 데이터베이스에 완전 격리 저장 (용량 무제한, 주소 안 깨짐)
+  const transaction = db.transaction(["videos"], "readwrite");
+  const store = transaction.objectStore("videos");
+  
+  store.put({ title: newTitle, blob: currentSelectedFile });
 
-  currentList.push({ url: tempVideoUrl, title: newTitle });
+  transaction.oncomplete = () => {
+    // 기존에 URL에 등록되어 있던 텍스트 제목 정보 싹 긁어오기
+    const currentTitles = [];
+    playlist.querySelectorAll('li').forEach(item => {
+      if (item.textContent && !item.textContent.includes("비어 있습니다")) {
+        currentTitles.push(item.textContent);
+      }
+    });
 
-  const jsonString = encodeURIComponent(JSON.stringify(currentList));
-  const compressedBase64 = btoa(jsonString);
+    // 새 제목 배열 추가 결합
+    currentTitles.push(newTitle);
 
-  window.location.search = `list=${compressedBase64}`;
+    // 오직 제목 텍스트 배열만 주소창에 압축 가공
+    const compressedBase64 = btoa(encodeURIComponent(JSON.stringify(currentTitles)));
+    
+    // 최종 URL 점프 리팩토링 이동
+    window.location.search = `list=${compressedBase64}`;
+  };
 });
 
-// 4. [단축공유] 단축 링크 원클릭 자동 캡처 복사
+// 5. 재생 목록의 타이틀 클릭 시 매칭 비디오 추출 구동
+playlist.addEventListener('click', (e) => {
+  const li = e.target.closest('li');
+  if (!li || li.style.color === 'rgb(85, 85, 85)') return;
+
+  document.querySelectorAll('#playlist li').forEach(item => item.classList.remove('active'));
+  li.classList.add('active');
+
+  const transaction = db.transaction(["videos"], "readonly");
+  const store = transaction.objectStore("videos");
+  const getReq = store.get(li.textContent);
+
+  getReq.onsuccess = () => {
+    if (getReq.result) {
+      video.src = URL.createObjectURL(getReq.result.blob);
+      video.load();
+      video.play();
+      playBtn.textContent = '❚❚';
+    } else {
+      alert("해당 영상 파일이 브라우저 데이터베이스에 존재하지 않습니다.");
+    }
+  };
+});
+
+// 6. 현재 누적된 단축 URL 링크 클립보드 원클릭 복사
 shareBtn.addEventListener('click', () => {
   if (!window.location.search.includes('list=')) {
-    alert("공유할 플레이리스트 목록이 비어 있습니다. 영상을 먼저 등록해 주세요!");
+    alert("공유할 플레이리스트 목록이 비어 있습니다!");
     return;
   }
-  
   navigator.clipboard.writeText(window.location.href)
-    .then(() => alert("현재 재생목록이 압축된 단축 공유 링크가 클립보드에 복사되었습니다!"))
-    .catch(() => alert("주소창을 마우스로 직접 복사해 주세요."));
+    .then(() => alert("축하합니다! 현재 재생목록 전체가 누적된 단축 주소가 클립보드에 복사되었습니다!"))
+    .catch(() => alert("주소창 링크를 직접 복사해 주세요."));
 });
 
-// 5. [전체화면] 브라우저 고유 네이티브 확장 스크린 구동
+// 전체화면 구동 매직 매핑
 fullscreenBtn.addEventListener('click', () => {
   if (video.requestFullscreen) video.requestFullscreen();
   else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
 });
 
-/* --- 미디어 플레이어 기본 구동부 프레임 --- */
+/* --- 비디오 플레이어 기본 조작 코어 액션 --- */
 function togglePlay() { video.paused ? video.play() : video.pause(); playBtn.textContent = video.paused ? '▶' : '❚❚'; }
 function updateProgress() {
   if (!video.duration) return;
@@ -115,18 +167,9 @@ video.addEventListener('timeupdate', updateProgress);
 progressBar.addEventListener('input', () => { video.currentTime = (progressBar.value * video.duration) / 100; });
 volumeBar.addEventListener('input', () => { video.volume = volumeBar.value; });
 
-playlist.addEventListener('click', (e) => {
-  const li = e.target.closest('li');
-  if (!li || !li.dataset.src) return;
-  document.querySelectorAll('#playlist li').forEach(item => item.classList.remove('active'));
-  li.classList.add('active');
-  video.src = li.dataset.src;
-  video.load(); video.play(); playBtn.textContent = '❚❚';
-});
-
 video.addEventListener('ended', () => {
   const currentActive = playlist.querySelector('.active');
   if (!currentActive) return;
   const nextVideo = currentActive.nextElementSibling;
-  if (nextVideo && nextVideo.dataset.src) nextVideo.click();
+  if (nextVideo) nextVideo.click();
 });
