@@ -5,7 +5,6 @@ const volumeBar = document.querySelector('.volume-bar');
 const timeDisplay = document.querySelector('.time-display');
 const fullscreenBtn = document.querySelector('.fullscreen-btn');
 const playlist = document.getElementById('playlist');
-const videoContainer = document.getElementById('video-container'); // 💡 부모 컨테이너 수집
 
 const inputFilename = document.getElementById('input-filename');
 const inputTitle = document.getElementById('input-title');
@@ -15,15 +14,14 @@ const speedBadge = document.getElementById('speed-badge');
 
 let isSpacePressed = false;
 
-// 내 깃허브 고유 호스팅 도메인 주소 자동 추출 공식
+// 깃허브 호스팅 계정 도메인 videos/ 폴더 절대 경로 추출 공식
 const GITHUB_VIDEOS_BASE = window.location.origin + window.location.pathname.replace('index.html', '') + 'videos/';
 
-// 안전한 유니코드 다국어(한글) Base64 변환 압축 세트 (인코딩 에러 원천 차단)
-/* 전 세계 브라우저 표준 명세에 맞춘 암호화 가공 처리 */
+// 다국어 안심 Base64 인코더/디코더 모듈 (한글 깨짐 원천 방지)
 function utoa(str) { return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode('0x' + p1))); }
 function atou(str) { return decodeURIComponent(atob(str).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')); }
 
-// 1. [복원] 주소창 암호문을 에러 없이 완벽히 해독하여 리스트 연동
+// 1. [복원] 주소창의 list 코드를 파싱하여 리스트 빌드
 document.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.search);
   const compressedData = urlParams.get('list');
@@ -34,7 +32,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   try {
-    // 안전 디코더 구동
     const decodedJson = atou(compressedData);
     const videoList = JSON.parse(decodedJson);
 
@@ -56,13 +53,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// 2. [등록] 리스트 데이터를 가공 및 한글 깨짐 없이 정밀 압축 전환
+// 2. [등록] 파일명과 제목을 누적 압축 변환
 generatorBtn.addEventListener('click', () => {
   const filenameValue = inputFilename.value.trim();
   const titleValue = inputTitle.value.trim() || "새로운 비디오";
 
   if (!filenameValue) {
-    alert("videos 폴더에 올린 실제 파일명(예: test.mp4)을 기입하세요!");
+    alert("videos 폴더에 올린 실제 파일명(예: test.mp4)을 정확히 입력해 주세요!");
     return;
   }
 
@@ -75,12 +72,11 @@ generatorBtn.addEventListener('click', () => {
 
   currentList.push({ file: filenameValue, title: titleValue });
 
-  // 자체 보정 특수 안심 인코더 모듈 통과
   const compressedBase64 = utoa(JSON.stringify(currentList));
   window.location.search = `list=${compressedBase64}`;
 });
 
-// 3. 리스트 클릭 시 매칭 스트리밍
+// 리스트 아이템 클릭 시 작동
 playlist.addEventListener('click', (e) => {
   const li = e.target.closest('li');
   if (!li || !li.dataset.src) return;
@@ -89,33 +85,34 @@ playlist.addEventListener('click', (e) => {
   li.classList.add('active');
 
   video.src = li.dataset.src;
-  video.load(); video.play(); playBtn.textContent = '❚❚';
+  video.load(); 
+  video.play(); 
+  playBtn.textContent = '❚❚';
 });
 
-// 4. 단축 주소 원클릭 클립보드 패치 복사
+// 공유 링크 주소 추출 복사
 shareBtn.addEventListener('click', () => {
   if (!window.location.search.includes('list=')) {
     alert("공유할 목록이 비어 있습니다!");
     return;
   }
   navigator.clipboard.writeText(window.location.href)
-    .then(() => alert("성공! 전 세계 어디서든 재생 오류가 없는 단축 공유 주소가 클립보드에 복사되었습니다!"))
-    .catch(() => alert("주소창 URL 링크를 마우스로 직접 복사해 주세요."));
+    .then(() => alert("성공! 전 세계 어디서든 재생 오류가 없는 단축 공유 주소가 클립보드에 복사되었습니다."));
 });
 
-// 5. 💡 [전체화면 핵심 교정] HTML5 순정창을 무력화하고 우리가 만든 네온 UI 상자 전체를 전체화면 처리
+// 전체화면 토글 기능
 function toggleFullscreen() {
+  const videoContainer = document.getElementById('video-container');
   if (!document.fullscreenElement) {
-    // 비디오 단독이 아닌, 비디오 컨테이너 상자 전체를 스크린 확장
     if (videoContainer.requestFullscreen) videoContainer.requestFullscreen();
     else if (videoContainer.webkitRequestFullscreen) videoContainer.webkitRequestFullscreen();
   } else {
     if (document.exitFullscreen) document.exitFullscreen();
   }
 }
-fullscreenBtn.addEventListener('click', toggleFullscreen);
+if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
 
-/* --- ⌨️ 유튜브 스타일 고급 단축키 엔진 --- */
+/* --- ⌨️ 유튜브 스타일 명품 단축키 시스템 --- */
 window.addEventListener('keydown', (e) => {
   if (document.activeElement === inputTitle || document.activeElement === inputFilename) return;
 
@@ -126,10 +123,17 @@ window.addEventListener('keydown', (e) => {
       else { video.playbackRate = 2.0; speedBadge.style.opacity = "1"; }
       break;
     case "ArrowRight":
-      e.preventDefault(); video.currentTime = Math.min(video.duration, video.currentTime + 5);
+      e.preventDefault(); 
+      // 💡 [방어 코드] 영상 로드가 제대로 안 되었을 때 탐색하면 생기는 나눗셈 NaN 에러 방지
+      if (!isNaN(video.duration) && isFinite(video.duration)) {
+        video.currentTime = Math.min(video.duration, video.currentTime + 5);
+      }
       break;
     case "ArrowLeft":
-      e.preventDefault(); video.currentTime = Math.max(0, video.currentTime - 5);
+      e.preventDefault(); 
+      if (!isNaN(video.duration) && isFinite(video.duration)) {
+        video.currentTime = Math.max(0, video.currentTime - 5);
+      }
       break;
     case "f":
     case "F":
@@ -145,9 +149,19 @@ window.addEventListener('keyup', (e) => {
   }
 });
 
-function togglePlay() { video.paused ? video.play() : video.pause(); playBtn.textContent = video.paused ? '▶' : '❚❚'; }
+function togglePlay() { 
+  // 💡 [방어 코드] 404 에러 등으로 영상이 주입되지 않은 먹통 상태일 때 재생 예외 우회
+  if (!video.src || video.error) return;
+  video.paused ? video.play() : video.pause(); 
+  playBtn.textContent = video.paused ? '▶' : '❚❚'; 
+}
+
 function updateProgress() {
-  if (!video.duration) return;
+  // 💡 [방어 코드] 404 터져서 비디오 데이터가 전혀 없거나 정상 수치가 아닐 때 진행 바 연산 멈추기 (161번째 라인 에러 완벽 해결)
+  if (!video.duration || isNaN(video.duration) || !isFinite(video.duration)) {
+    timeDisplay.textContent = "00:00 / 00:00";
+    return;
+  }
   progressBar.value = (video.currentTime / video.duration) * 100;
   const curMin = String(Math.floor(video.currentTime / 60)).padStart(2, '0');
   const curSec = String(Math.floor(video.currentTime % 60)).padStart(2, '0');
@@ -155,10 +169,15 @@ function updateProgress() {
   const durSec = String(Math.floor(video.duration % 60)).padStart(2, '0');
   timeDisplay.textContent = `${curMin}:${curSec} / ${durMin}:${durSec}`;
 }
+
 playBtn.addEventListener('click', togglePlay);
 video.addEventListener('click', togglePlay);
 video.addEventListener('timeupdate', updateProgress);
-progressBar.addEventListener('input', () => { video.currentTime = (progressBar.value * video.duration) / 100; });
+progressBar.addEventListener('input', () => { 
+  if (!isNaN(video.duration) && isFinite(video.duration)) {
+    video.currentTime = (progressBar.value * video.duration) / 100; 
+  }
+});
 volumeBar.addEventListener('input', () => { video.volume = volumeBar.value; });
 
 video.addEventListener('ended', () => {
