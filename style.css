@@ -10,38 +10,55 @@ body {
   align-items: center;
 }
 
-/* 💡 KOWAI 특유의 로고 영역 정밀 인테리어 디자인 */
+/* 💡 KOWAI 테일윈드 스타일 헤더 로고 바 번역 컴파일 */
 .header-logo-bar {
   display: flex;
   align-items: center;
-  gap: 14px;
   width: 100%;
   max-width: 1000px;
   margin-bottom: 30px;
   padding-bottom: 15px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
-.logo-icon {
-  width: 42px;
-  height: 42px;
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); /* 보랏빛 그라데이션 박스 */
-  border-radius: 12px;
+.logo-link {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* gap-3 */
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.logo-icon-box {
+  width: 32px; /* w-8 */
+  height: 32px; /* h-8 */
+  background: linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%); /* from-blue-400 to-purple-600 */
+  border-radius: 8px; /* rounded-lg */
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.25);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3); /* shadow-lg */
+}
+.ghost-svg {
+  width: 20px; /* w-5 */
+  height: 20px; /* h-5 */
+  color: #ffffff; /* text-white */
 }
 .logo-text {
-  font-size: 26px;
-  font-weight: 900; /* 엄청나게 굵은 볼드 서체 */
-  color: #ffffff;
-  letter-spacing: 1.5px;
+  font-size: 24px; /* text-2xl */
+  font-weight: 800; /* font-extrabold */
+  color: #ffffff; /* text-white */
+  letter-spacing: 0.05em; /* tracking-wider */
+  transition: color 0.2s ease;
 }
 .logo-dot {
-  color: #3b82f6; /* 끝에 찍히는 파란색 사각 점 */
+  color: #60a5fa; /* text-blue-400 */
 }
 
-/* 플레이어 및 제어창 구도 레이아웃 */
+/* 마우스 호버 시 전체 로고 링크 색상 피드백 효과 연동 */
+.logo-link:hover .logo-text {
+  color: #bfdbfe; /* group-hover:text-blue-200 */
+}
+
+/* 플레이어 구도 핵심 디자인 레이어 (이전과 동일) */
 .upload-section { position: relative; z-index: 10; margin-bottom: 25px; width: 100%; max-width: 1000px; display: flex; flex-direction: column; gap: 12px; }
 .form-group { display: flex; gap: 10px; width: 100%; }
 .upload-section input { background: rgba(157, 78, 221, 0.05); border: 1px solid rgba(157, 78, 221, 0.3); border-radius: 4px; padding: 10px 14px; color: #fff; font-size: 13px; outline: none; transition: all 0.2s; }
