@@ -159,3 +159,40 @@ body {
 #playlist li.active { background: rgba(124, 58, 237, 0.12); color: #a78bfa; border-left-color: #7c3aed; font-weight: bold; }
 #playlist::-webkit-scrollbar { width: 4px; }
 #playlist::-webkit-scrollbar-thumb { background: rgba(124, 58, 237, 0.3); border-radius: 2px; }
+/* --- 삭제 버튼 컴포넌트 추가 디자인 팩 --- */
+#playlist li {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 40px !important; /* 버튼이 들어올 공간을 미리 확보 */
+}
+.list-item-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-grow: 1;
+}
+.item-del-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #64748b; /* 평소에는 은은한 연회색 */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  opacity: 0; /* 평소에는 숨겨둠 */
+  transition: all 0.15s ease;
+}
+#playlist li:hover .item-del-btn {
+  opacity: 1; /* 마우스를 올렸을 때만 세련되게 등장 */
+}
+.item-del-btn:hover {
+  background: rgba(239, 83, 80, 0.15) !important; /* 마우스 호버시 붉은 네온빛 피드백 */
+  color: #ef5350 !important;
+  box-shadow: 0 0 8px rgba(239, 83, 80, 0.2);
+}
