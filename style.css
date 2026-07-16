@@ -10,64 +10,57 @@ body {
   align-items: center;
 }
 
+/* 💡 KOWAI 특유의 로고 영역 정밀 인테리어 디자인 */
+.header-logo-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 1000px;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+.logo-icon {
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); /* 보랏빛 그라데이션 박스 */
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.25);
+}
+.logo-text {
+  font-size: 26px;
+  font-weight: 900; /* 엄청나게 굵은 볼드 서체 */
+  color: #ffffff;
+  letter-spacing: 1.5px;
+}
+.logo-dot {
+  color: #3b82f6; /* 끝에 찍히는 파란색 사각 점 */
+}
+
+/* 플레이어 및 제어창 구도 레이아웃 */
 .upload-section { position: relative; z-index: 10; margin-bottom: 25px; width: 100%; max-width: 1000px; display: flex; flex-direction: column; gap: 12px; }
 .form-group { display: flex; gap: 10px; width: 100%; }
-
-.upload-section input {
-  background: rgba(157, 78, 221, 0.05); border: 1px solid rgba(157, 78, 221, 0.3);
-  border-radius: 4px; padding: 10px 14px; color: #fff; font-size: 13px; outline: none; transition: all 0.2s;
-}
+.upload-section input { background: rgba(157, 78, 221, 0.05); border: 1px solid rgba(157, 78, 221, 0.3); border-radius: 4px; padding: 10px 14px; color: #fff; font-size: 13px; outline: none; transition: all 0.2s; }
 #input-filename { flex-grow: 2; }
 #input-title { flex-grow: 1; }
 .upload-section input:focus { border-color: #ff2e7e; box-shadow: 0 0 10px rgba(255, 46, 126, 0.2); }
-
-.upload-btn, .share-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 13px;
-  font-weight: 600; white-space: nowrap; transition: all 0.25s ease; box-sizing: border-box;
-}
+.upload-btn, .share-btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; white-space: nowrap; transition: all 0.25s ease; box-sizing: border-box; }
 .upload-btn { background: rgba(255, 46, 126, 0.1); color: #ff2e7e; border: 1px solid rgba(255, 46, 126, 0.3); }
 .upload-btn:hover { background: rgba(255, 46, 126, 0.2); box-shadow: 0 0 20px rgba(255, 46, 126, 0.4); text-shadow: 0 0 8px rgba(255, 46, 126, 0.6); }
 .share-btn { background: #9d4edd; color: #ffffff; border: none; width: 100%; font-size: 14px; box-shadow: 0 4px 14px rgba(157, 78, 221, 0.4); }
 .share-btn:hover { background: #b565f8; box-shadow: 0 4px 20px rgba(157, 78, 221, 0.6); }
 
 .main-container { display: flex; gap: 20px; width: 100%; max-width: 1000px; }
-
-/* 💡 비디오 박스: 16:9 비율 및 전체화면 대응 */
-.video-container { 
-  position: relative; 
-  width: 70%; 
-  aspect-ratio: 16 / 9;
-  background: #000000; 
-  border-radius: 6px; 
-  overflow: hidden; 
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6); 
-  border: 1px solid rgba(255, 255, 255, 0.05); 
-  display: flex; 
-  align-items: center; 
-  justify-content: center;
-}
+.video-container { position: relative; width: 70%; aspect-ratio: 16 / 9; background: #000000; border-radius: 6px; overflow: hidden; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; }
 .video { width: 100%; height: 100%; object-fit: contain; }
-
-/* 💡 배속 배치 */
-#speed-badge {
-  position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.7); color: #ff2e7e; 
-  padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; opacity: 0; 
-  transition: opacity 0.2s; pointer-events: none; z-index: 6;
-}
-
-/* 💡 커스텀 컨트롤러: 전체화면 모드에서도 항상 하단 최상단 레이어에 정렬되도록 조정 */
-.controls { 
-  position: absolute; bottom: 0; left: 0; right: 0; 
-  background: rgba(11, 11, 14, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); 
-  border-top: 1px solid rgba(255, 46, 126, 0.2); opacity: 0; transition: opacity 0.2s ease; 
-  padding: 14px 16px; z-index: 2147483647; 
-}
+#speed-badge { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.7); color: #ff2e7e; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 6; }
+.controls { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(11, 11, 14, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid rgba(255, 46, 126, 0.2); opacity: 0; transition: opacity 0.2s ease; padding: 14px 16px; z-index: 2147483647; }
 .video-container:hover .controls { opacity: 1; }
-
-/* 💡 전체화면 상태일 때 컨트롤 바 강제 고정 */
 .video-container:fullscreen .controls { bottom: 0; padding: 20px; }
-
 .progress-bar { width: 100%; cursor: pointer; margin-bottom: 10px; accent-color: #ff2e7e; height: 4px; background: #252529; }
 .buttons { display: flex; align-items: center; gap: 18px; color: #ffffff; width: 100%; }
 .buttons button { background: none; border: none; color: #ff2e7e; font-size: 15px; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: all 0.15s; }
