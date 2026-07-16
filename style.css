@@ -214,3 +214,73 @@ body {
   box-shadow: 0 0 8px rgba(239, 83, 80, 0.2);
 }
 .item-del-btn svg { pointer-events: none; }
+/* --- 💡 로딩 스피너 애니메이션 디자인 팩 --- */
+.spinner-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.4); /* 화면을 살짝 어둡게 마스킹 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  opacity: 0; /* 평소에는 완전히 보이지 않음 */
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* 스피너가 활성화되었을 때 작동할 클래스 */
+.spinner-overlay.show {
+  opacity: 1;
+}
+
+/* 둥근 도넛 형태의 네온 퍼플 스피너 뼈대 */
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(124, 58, 237, 0.2); /* 은은한 바탕 원 */
+  border-top: 4px solid #7c3aed; /* 회전할 포인트 컬러 */
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite; /* 무한 회전 애니메이션 */
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
+}
+
+/* 360도 회전 키프레임 설정 */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/* --- 💡 로딩 스피너 애니메이션 디자인 팩 --- */
+.spinner-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.4); /* 화면을 살짝 어둡게 마스킹 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  opacity: 0; /* 평소에는 완전히 보이지 않음 */
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* 스피너가 활성화되었을 때 작동할 클래스 */
+.spinner-overlay.show {
+  opacity: 1;
+}
+
+/* 둥근 도넛 형태의 네온 퍼플 스피너 뼈대 */
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(124, 58, 237, 0.2); /* 은은한 바탕 원 */
+  border-top: 4px solid #7c3aed; /* 회전할 포인트 컬러 */
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite; /* 무한 회전 애니메이션 */
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
+}
+
+/* 360도 회전 키프레임 설정 */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
