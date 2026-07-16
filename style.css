@@ -1,0 +1,179 @@
+/* 전체 배경: 깊고 어두운 고딕 다크 톤 */
+body { 
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+  background-color: #0b0b0e; 
+  background-image: linear-gradient(135deg, #0b0b0e 0%, #150f1d 100%); /* 은은한 보랏빛 밤하늘 */
+  color: #e2e8f0; 
+  padding: 40px 20px; 
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 상단 업로드 버튼 영역 */
+.upload-section { margin-bottom: 25px; width: 100%; max-width: 1000px; text-align: right; }
+#file-input { display: none; }
+.upload-btn {
+  display: inline-block; 
+  background: rgba(255, 46, 126, 0.1); /* 네온 핑크 투명 배경 */
+  color: #ff2e7e; /* 강렬한 네온 핑크 */
+  padding: 10px 20px; 
+  border-radius: 4px; 
+  cursor: pointer; 
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 46, 126, 0.3);
+  box-shadow: 0 0 12px rgba(255, 46, 126, 0.1);
+  transition: all 0.25s ease;
+}
+.upload-btn:hover { 
+  background: rgba(255, 46, 126, 0.2); 
+  box-shadow: 0 0 20px rgba(255, 46, 126, 0.4);
+  text-shadow: 0 0 8px rgba(255, 46, 126, 0.6);
+}
+
+/* 메인 구도 블록 */
+.main-container { 
+  display: flex; 
+  gap: 20px; 
+  width: 100%; 
+  max-width: 1000px; 
+}
+
+/* 비디오 플레이어 본체 (어둠 속 네온 테두리) */
+.video-container { 
+  position: relative; 
+  width: 70%; 
+  background: #000000; 
+  border-radius: 6px; 
+  overflow: hidden; 
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  height: fit-content;
+}
+.video { width: 100%; display: block; }
+
+/* 사이버펑크 스타일 하단 컨트롤 바 */
+.controls {
+  position: absolute; 
+  bottom: 0; 
+  left: 0; 
+  right: 0;
+  background: rgba(11, 11, 14, 0.85); 
+  backdrop-filter: blur(12px); 
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 46, 126, 0.2); /* 핑크 상단선 */
+  opacity: 0; 
+  transition: opacity 0.2s ease;
+  padding: 12px 16px;
+}
+.video-container:hover .controls { opacity: 1; }
+
+/* 네온 컬러 재생 바 */
+.progress-bar { 
+  width: 100%; 
+  cursor: pointer; 
+  margin-bottom: 10px; 
+  accent-color: #ff2e7e; /* 조작 노브 핑크색 */
+  height: 4px;
+  background: #252529;
+}
+
+.buttons { display: flex; align-items: center; gap: 18px; color: #ffffff; }
+button { 
+  background: none; 
+  border: none; 
+  color: #ff2e7e; /* 네온 핑크 아이콘 */
+  font-size: 15px; 
+  cursor: pointer; 
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+button:hover { 
+  background: rgba(255, 46, 126, 0.15); 
+  text-shadow: 0 0 5px #ff2e7e;
+}
+.time-display { font-size: 12px; color: #a0aec0; font-family: monospace; }
+.volume-bar { width: 70px; accent-color: #9d4edd; height: 4px; cursor: pointer; } /* 볼륨은 보라색 */
+
+/* 사이드바 재생 목록 (딥 퍼플 & 블랙 카드 감성) */
+.playlist-container { 
+  width: 30%; 
+  background: rgba(18, 14, 26, 0.7); /* 딥 보라 테마 블랙 */
+  backdrop-filter: blur(10px);
+  padding: 20px; 
+  border-radius: 6px; 
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(157, 78, 221, 0.2); /* 보라색 투명 테두리 */
+  display: flex;
+  flex-direction: column;
+}
+.playlist-container h3 { 
+  margin-top: 0; 
+  font-size: 15px; 
+  font-weight: 600; 
+  color: #9d4edd; /* 신비로운 보라색 */
+  letter-spacing: 1px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(157, 78, 221, 0.2);
+}
+#playlist { 
+  list-style: none; 
+  padding: 0; 
+  margin: 0; 
+  max-height: 380px;
+  overflow-y: auto; 
+}
+
+/* 개별 리스트 아이템 */
+#playlist li { 
+  padding: 12px; 
+  border-radius: 4px;
+  margin-top: 6px;
+  cursor: pointer; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center;
+  font-size: 13px;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+#playlist li:hover { 
+  background: rgba(157, 78, 221, 0.08); 
+  border-color: rgba(157, 78, 221, 0.3);
+  color: #ffffff;
+}
+
+/* 관리자 전용 영상 (강렬하게 빛나는 핑크 라벨) */
+.fixed-video { 
+  background: rgba(255, 46, 126, 0.05) !important; 
+  color: #ff2e7e !important; 
+  border-left: 3px solid #ff2e7e !important;
+  font-weight: bold;
+}
+
+/* 리스트 내 유저 영상 삭제 버튼 */
+.del-btn { 
+  background: rgba(244, 63, 94, 0.1) !important; 
+  color: #f43f5e !important; 
+  border: 1px solid rgba(244, 63, 94, 0.2) !important;
+  border-radius: 3px; 
+  padding: 2px 6px !important; 
+  font-size: 11px; 
+}
+.del-btn:hover { 
+  background: #f43f5e !important; 
+  color: white !important; 
+  box-shadow: 0 0 8px #f43f5e;
+}
+
+/* 힙한 스크롤바 디자인 */
+#playlist::-webkit-scrollbar { width: 4px; }
+#playlist::-webkit-scrollbar-thumb { background: rgba(157, 78, 221, 0.3); border-radius: 2px; }
+#playlist::-webkit-scrollbar-thumb:hover { background: #ff2e7e; }
