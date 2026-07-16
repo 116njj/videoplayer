@@ -2,7 +2,7 @@
 body { 
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
   background-color: #0b0b0e; 
-  background-image: radial-gradient(circle at 50% 0%, #171226 0%, #0b0b0e 80%); /* 에라토 홈 특유의 딥퍼플 그라데이션 */
+  background-image: radial-gradient(circle at 50% 0%, #171226 0%, #0b0b0e 80%);
   color: #f8fafc; 
   padding: 40px 24px; 
   margin: 0;
@@ -12,7 +12,7 @@ body {
   min-height: 100vh;
 }
 
-/* 💡 Erato.dev 메인 로고 영역 인테리어 */
+/* Erato.dev 메인 로고 영역 인테리어 */
 .header-logo-bar {
   display: flex;
   align-items: center;
@@ -31,7 +31,7 @@ body {
 .logo-icon-box {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%); /* 홈포트폴리오 고유 그라데이션 아이콘 웰 */
+  background: linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -55,10 +55,10 @@ body {
   font-weight: 500;
 }
 
-/* 대시보드 카드 감성의 상단 제어 바 랙 */
+/* 💡 대시보드 카드 제어 바 랙 (레이어 순위 최상위 보장 및 간섭 차단) */
 .upload-section { 
   position: relative; 
-  z-index: 10; 
+  z-index: 9999 !important; /* 그 어떠한 레이어도 이 영역을 침범하지 못하도록 강제 격리 */
   margin-bottom: 24px; 
   width: 100%; 
   max-width: 1000px; 
@@ -66,9 +66,9 @@ body {
   flex-direction: column; 
   gap: 10px; 
 }
-.form-group { display: flex; gap: 10px; width: 100%; }
+.form-group { display: flex; gap: 10px; width: 100%; position: relative; z-index: 10000; }
 
-/* 입력 필드 디자인 정비 */
+/* 입력 필드 디자인 */
 .upload-section input {
   background: rgba(30, 27, 46, 0.4);
   border: 1px solid rgba(124, 58, 237, 0.15);
@@ -78,6 +78,8 @@ body {
   font-size: 13px; 
   outline: none; 
   transition: all 0.2s ease;
+  position: relative;
+  z-index: 10001;
 }
 #input-filename { flex-grow: 2; }
 #input-title { flex-grow: 1; }
@@ -87,11 +89,13 @@ body {
   box-shadow: 0 0 12px rgba(124, 58, 237, 0.2); 
 }
 
-/* 버튼 세트 스타일 가공 */
+/* 버튼 세트 스타일 */
 .upload-btn, .share-btn {
   display: inline-flex; align-items: center; justify-content: center;
   padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 13px;
   font-weight: 600; white-space: nowrap; transition: all 0.2s ease; box-sizing: border-box;
+  position: relative;
+  z-index: 10002;
 }
 .upload-btn { 
   background: linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(96, 165, 250, 0.1) 100%);
@@ -114,7 +118,7 @@ body {
 .share-btn:hover { background: #6d28d9; box-shadow: 0 4px 18px rgba(124, 58, 237, 0.5); }
 
 /* 메인 구도 블록 */
-.main-container { display: flex; gap: 20px; width: 100%; max-width: 1000px; }
+.main-container { display: flex; gap: 20px; width: 100%; max-width: 1000px; position: relative; z-index: 1; }
 
 /* 16:9 비율 유지 비디오 디스플레이 */
 .video-container { 
@@ -154,45 +158,59 @@ body {
 .playlist-header { display: flex; align-items: center; gap: 8px; color: #7c3aed; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 12px; margin-bottom: 6px; }
 .playlist-header h3 { margin: 0; font-size: 14px; font-weight: 600; color: #e2e8f0; letter-spacing: 0.5px; }
 #playlist { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; }
-#playlist li { padding: 12px; border-radius: 6px; margin-top: 6px; cursor: pointer; font-size: 13px; color: #94a3b8; background: rgba(255, 255, 255, 0.01); border-left: 3px solid rgba(124, 58, 237, 0.2); transition: all 0.2s ease; }
-#playlist li:hover { background: rgba(124, 58, 237, 0.06); color: #ffffff; border-left-color: #a78bfa; }
-#playlist li.active { background: rgba(124, 58, 237, 0.12); color: #a78bfa; border-left-color: #7c3aed; font-weight: bold; }
-#playlist::-webkit-scrollbar { width: 4px; }
-#playlist::-webkit-scrollbar-thumb { background: rgba(124, 58, 237, 0.3); border-radius: 2px; }
-/* --- 삭제 버튼 컴포넌트 추가 디자인 팩 --- */
-#playlist li {
+
+/* 💡 리스트 배치 및 개별 엑스 버튼 인터페이스 (간섭 버그 해결) */
+#playlist li { 
   position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-right: 40px !important; /* 버튼이 들어올 공간을 미리 확보 */
+  padding: 12px 40px 12px 12px !important; /* 우측에 정렬된 X버튼 영역을 위해 여백 격리 */
+  border-radius: 6px; 
+  margin-top: 6px; 
+  cursor: pointer; 
+  font-size: 13px; 
+  color: #94a3b8; 
+  background: rgba(255, 255, 255, 0.01); 
+  border-left: 3px solid rgba(124, 58, 237, 0.2); 
+  transition: all 0.2s ease; 
+  box-sizing: border-box;
 }
+#playlist li:hover { background: rgba(124, 58, 237, 0.06); color: #ffffff; border-left-color: #a78bfa; }
+#playlist li.active { background: rgba(124, 58, 237, 0.12); color: #a78bfa; border-left-color: #7c3aed; font-weight: bold; }
+#playlist::-webkit-scrollbar { width: 4px; }
+#playlist::-webkit-scrollbar-thumb { background: rgba(124, 58, 237, 0.3); border-radius: 2px; }
+
 .list-item-text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   flex-grow: 1;
+  pointer-events: none; /* 텍스트 긁힘으로 인한 버튼 마스킹 현상 해결 */
 }
+
 .item-del-btn {
   position: absolute;
-  right: 10px;
-  background: none;
-  border: none;
-  color: #64748b; /* 평소에는 은은한 연회색 */
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none !important;
+  border: none !important;
+  color: #64748b !important; 
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px;
+  padding: 6px !important;
   border-radius: 4px;
-  opacity: 0; /* 평소에는 숨겨둠 */
+  opacity: 0; 
   transition: all 0.15s ease;
+  z-index: 50; /* 리스트 클릭보다 우선순위 부여 */
 }
-#playlist li:hover .item-del-btn {
-  opacity: 1; /* 마우스를 올렸을 때만 세련되게 등장 */
-}
+#playlist li:hover .item-del-btn { opacity: 1; }
 .item-del-btn:hover {
-  background: rgba(239, 83, 80, 0.15) !important; /* 마우스 호버시 붉은 네온빛 피드백 */
+  background: rgba(239, 83, 80, 0.15) !important; 
   color: #ef5350 !important;
   box-shadow: 0 0 8px rgba(239, 83, 80, 0.2);
 }
+.item-del-btn svg { pointer-events: none; }
